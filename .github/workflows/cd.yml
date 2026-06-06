@@ -8,21 +8,21 @@ on:
 jobs:
   deploy:
     runs-on: ubuntu-latest
+    env:
+      RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}
 
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
 
       - name: Install Railway CLI
-        if: ${{ secrets.RAILWAY_TOKEN }}
+        if: ${{ env.RAILWAY_TOKEN != '' }}
         run: npm install -g @railway/cli
 
       - name: Deploy to Railway
-        if: ${{ secrets.RAILWAY_TOKEN }}
-        env:
-          RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}
+        if: ${{ env.RAILWAY_TOKEN != '' }}
         run: railway up --service forum-api
 
       - name: Skip deploy when token is missing
-        if: ${{ !secrets.RAILWAY_TOKEN }}
+        if: ${{ env.RAILWAY_TOKEN == '' }}
         run: echo "RAILWAY_TOKEN is not set. Skipping deployment."
